@@ -1,49 +1,69 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerControl : MonoBehavior
 {
-    public float speed;
-    public Text countText;
-    public Text winText;
+	public float speed;
+	public TextMeshProUGUI countText;
+	public GameObject winTextObject;
 
-    private Rigidbody rb;
-    private int count;
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        count = 0;
-        SetCountText();
-        winText.text = "";
-    }
+	private float movementX;
+	private float movementY;
 
-    void FixedUpdate()
-    {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+	private Rigidbody rb;
+	private int count;
 
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+	void Start()
+	{
+		rb = GetComponent<Rigidbody>();
 
-        rb.AddForce(movement * speed);
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Pick Ups"))
-        {
-            other.gameObject.SetActive(false);
-            count = count + 1;
-            SetCountText();
-        }
-    }
-    void SetCountText()
-    {
+		count = 0;
 
-        countText.text = "Count: " + count.ToString();
-        if (count >= 13)
-        {
-            winText.text = "Wow You Win!";
-        }
-    }
+		SetCountText();
+
+		winTextObject.SetActive(false);
+	}
+
+	void FixedUpdate()
+	{
+		
+		Vector3 movement = new Vector3(movementX, 0.0f, movementY);
+
+		rb.AddForce(movement * speed);
+	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		
+		if (other.gameObject.CompareTag("Pick Up"))
+		{
+			other.gameObject.SetActive(false);
+			
+			count = count + 1;
+			
+			SetCountText();
+		}
+	}
+
+	void OnMove(InputValue value)
+	{
+		Vector2 v = value.Get<Vector2>();
+
+		movementX = v.x;
+		movementY = v.y;
+	}
+
+	void SetCountText()
+	{
+		countText.text = "Count: " + count.ToString();
+
+		if (count >= 12)
+		{
+			
+			winTextObject.SetActive(true);
+		}
+	}
 }
